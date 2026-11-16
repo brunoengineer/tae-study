@@ -38,3 +38,17 @@ Other scripts: `npm run build` (type-check + production build), `npm run preview
 
 ## Content sources
 Syllabus content and the 40 sample questions come from the ISTQB® CTAL-TAE v2.0 syllabus and Sample Exam A v2.4 (in `docs/`), © ISTQB®, used for personal, non-commercial study. The practice questions, mnemonics and diagrams are original.
+
+## Publish on GitHub Pages
+
+Deployment is automated by [.github/workflows/deploy.yml](.github/workflows/deploy.yml): every push to `main` type-checks, builds, and publishes `dist/` to GitHub Pages.
+
+One-time setup:
+1. Push this repo to GitHub (branch `main`).
+2. In the repo on GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+3. Push (or run the workflow manually from the **Actions** tab). The site appears at `https://<your-user>.github.io/tae-study/`.
+
+Notes:
+- `vite.config.ts` uses `base: './'`, so the build works under any repo name; the app uses hash routes (`#/learn/...`), so deep links work on Pages without extra config.
+- Run `npm install` once while online and commit `package-lock.json` — the workflow then uses `npm ci` for reproducible builds.
+- Progress is stored in each visitor's browser (localStorage); nothing is sent to a server.

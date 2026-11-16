@@ -1,11 +1,11 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { chapters, chapterById } from '../data/chapters';
 import { scenesFor, sceneKey, type Check } from '../data/lessons';
 import { markScene, setRecallMode, useStore, visitChapter } from '../lib/store';
 import { go } from '../lib/router';
 import { chapterStats } from '../lib/progress';
 import { Ring } from '../components/Shell';
-import { sfx } from '../lib/util';
+import { sfx, shuffle } from '../lib/util';
 
 export function LearnIndex() {
   const s = useStore((s) => s);
@@ -46,12 +46,15 @@ function RecallCheck({ check, done, onCorrect }: { check: Check; done: boolean; 
   useEffect(() => setPick(null), [check]);
   const answered = pick !== null;
   const right = pick === check.answer;
+  // Shuffle display order so the correct answer isn't always in the same position
+  const order = useMemo(() => shuffle(check.options.map((_, i) => i)), [check]);
   return (
     <div className="card flat" style={{ background: 'var(--panel-2)' }}>
       <div className="row"><span style={{ fontSize: 22 }}>🧠</span><b>Recall check</b>{done && <span className="chip good">✓ completed</span>}</div>
       <div style={{ marginTop: 8, fontWeight: 600 }}>{check.q}</div>
       <div className="options" style={{ marginTop: 10 }}>
-        {check.options.map((o, i) => {
+        {order.map((i, pos) => {
+          const o = check.options[i];
           let cls = 'opt';
           if (answered) { if (i === check.answer) cls += ' right'; else if (i === pick) cls += ' wrong'; }
           return (
@@ -59,7 +62,7 @@ function RecallCheck({ check, done, onCorrect }: { check: Check; done: boolean; 
               setPick(i);
               if (i === check.answer) { sfx('good'); onCorrect(); } else sfx('bad');
             }}>
-              <span className="letter">{'abcd'[i]}</span><span>{o}</span>
+              <span className="letter">{'abcd'[pos]}</span><span>{o}</span>
             </button>
           );
         })}
