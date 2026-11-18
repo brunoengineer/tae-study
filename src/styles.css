@@ -227,6 +227,8 @@ kbd {
 }
 .hero h1 { font-size: 36px; }
 .metro { width: 100%; height: auto; display: block; }
+.map-scroll { overflow-x: auto; }
+.nav-label-short { display: none; }
 .metro .station { cursor: pointer; }
 .metro .station:hover circle.outer { stroke-width: 7; }
 .metro text { font-family: var(--display); }
@@ -280,7 +282,21 @@ kbd {
 }
 .node:hover { border-color: var(--c, var(--accent)); transform: translateY(-2px); }
 .node.sel { border-color: var(--c, var(--accent)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c, var(--accent)) 30%, transparent), 0 10px 30px rgba(0,0,0,0.3); background: color-mix(in srgb, var(--c, var(--accent)) 14%, transparent); }
+/* Hub nodes sit on top of connector lines: keep them opaque so lines don't strike through text */
+.hub .node { background: linear-gradient(var(--panel-2), var(--panel-2)), var(--panel-solid); }
+.hub .node.sel { background: linear-gradient(color-mix(in srgb, var(--c, var(--accent)) 14%, transparent), color-mix(in srgb, var(--c, var(--accent)) 14%, transparent)), var(--panel-solid); }
 .node .n-ico { font-size: 30px; line-height: 1.2; }
+/* long single words ("Preproduction", "setup/teardown") must wrap inside narrow flow nodes */
+.node .n-title, .node .n-sub { overflow-wrap: anywhere; hyphens: auto; }
+/* Hub: when its own box is too narrow for the radial layout, fall back to a 2-column grid.
+   A container query (not a viewport media query) so it also kicks in on tablets beside the sidebar. */
+.hub-wrap { container-type: inline-size; }
+@container (max-width: 560px) {
+  .hub { aspect-ratio: auto !important; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .hub > svg { display: none; }
+  .hub > div { position: static !important; transform: none !important; width: auto !important; }
+  .hub > div:nth-of-type(1) { grid-column: 1 / -1; }
+}
 .node .n-title { font-weight: 700; font-family: var(--display); margin-top: 4px; }
 .node .n-sub { font-size: 12px; color: var(--muted); }
 .detail {
@@ -292,7 +308,8 @@ kbd {
 .detail li { margin: 4px 0; }
 
 .flow { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 6px 2px 10px; }
-.flow > .node { flex: 1 1 0; min-width: 120px; }
+/* nodes are wrapped in display:contents divs, so match descendants, not children */
+.flow .node { flex: 1 1 0; min-width: 120px; }
 .flow-arrow { display: grid; place-items: center; padding: 0 6px; color: var(--faint); font-size: 22px; flex: 0 0 auto; }
 .flow.vertical { flex-direction: column; }
 .flow.vertical .flow-arrow { padding: 4px 0; }
@@ -386,7 +403,7 @@ kbd {
 .fc-front { background: linear-gradient(145deg, color-mix(in srgb, var(--c) 30%, var(--panel-solid)), var(--panel-solid)); }
 .fc-back { transform: rotateY(180deg); background: var(--panel-solid); font-size: 16.5px; line-height: 1.6; }
 .fc-front .fc-term { font-family: var(--display); font-size: 28px; font-weight: 700; }
-.leitner { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.leitner { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
 .box { border-radius: 14px; padding: 12px; text-align: center; border: 1px solid var(--border); background: var(--panel-2); }
 .box b { font-size: 24px; font-family: var(--display); display: block; }
 
@@ -421,6 +438,8 @@ kbd {
 /* ============ Mind map ============ */
 .mindmap-wrap { border-radius: 24px; overflow: hidden; border: 1px solid var(--border); background: radial-gradient(circle at center, rgba(139,108,255,0.12), transparent 70%); }
 .mindmap text { font-family: var(--display); pointer-events: none; }
+/* halo keeps labels readable where a connector passes behind them */
+.mindmap .mm-halo { paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; }
 .mindmap .mm-node { cursor: pointer; transition: opacity 0.3s; }
 .mindmap .mm-dim { opacity: 0.18; }
 
@@ -439,6 +458,9 @@ table.cmp tr:hover td { background: var(--panel-2); }
 .exam-grid { grid-template-columns: minmax(0, 1fr) 260px; gap: 18px; align-items: start; }
 .gtaa-grid { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 12px; align-items: center; }
 @media (max-width: 760px) { .gtaa-grid { grid-template-columns: 1fr; } }
+/* SDLC scene: give the diagram more room than the bullet text */
+.g2.sdlc-grid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); }
+@media (max-width: 1000px) { .g2.sdlc-grid { grid-template-columns: minmax(0, 1fr); } }
 
 /* ============ Responsive ============ */
 @media (max-width: 1000px) {
@@ -450,10 +472,6 @@ table.cmp tr:hover td { background: var(--panel-2); }
   .app { grid-template-columns: minmax(0, 1fr); }
   .content { overflow-x: hidden; }
   .hide-sm { display: none !important; }
-  .hub { aspect-ratio: auto !important; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .hub > svg { display: none; }
-  .hub > div { position: static !important; transform: none !important; width: auto !important; }
-  .hub > div:nth-of-type(1) { grid-column: 1 / -1; }
   .sidebar {
     position: fixed; bottom: 0; top: auto; left: 0; right: 0; height: auto; z-index: 50; flex-direction: row;
     padding: 6px; border-right: none; border-top: 1px solid var(--border); background: var(--panel-solid); overflow-x: auto;
@@ -462,12 +480,24 @@ table.cmp tr:hover td { background: var(--panel-2); }
   .nav-item { flex-direction: column; gap: 2px; padding: 6px 2px; font-size: 9px; flex: 1 1 0; min-width: 0; text-align: center; }
   .nav-item.active { box-shadow: inset 0 3px 0 var(--accent); }
   .nav-label-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .nav-label-short { display: block; white-space: nowrap; }
+  .nav-item:has(.nav-label-short) .nav-label-text { display: none; }
+  /* step flows: stack vertically instead of clipping off the right edge */
+  .flow:not(.vertical) { flex-direction: column; overflow-x: visible; }
+  .flow:not(.vertical) .flow-arrow, .pipe-row > .flow-arrow { transform: rotate(90deg); padding: 2px 0; }
+  .flow .node { min-width: 0; }
+  .pipe-row { flex-direction: column; }
+  /* wide maps scroll sideways at a readable size rather than shrinking to ~5px text */
+  .metro { min-width: 680px; }
+  .mindmap-wrap { overflow-x: auto; --map-min: 720px; }
+  .toasts { bottom: 84px; right: 12px; left: 12px; }
   .content { padding: 16px 16px 90px; }
   .topbar { padding: 10px 16px; }
   .xpbar { width: 110px; }
   .g2, .g3, .g4 { grid-template-columns: 1fr; }
   .page-title { font-size: 26px; }
-  .leitner { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .leitner { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .leitner .box { padding: 8px 4px; }
   .exam-nav { grid-template-columns: repeat(8, 1fr); }
   .exam-grid { grid-template-columns: 1fr; }
   .exam-grid > .card[style] { position: static !important; }

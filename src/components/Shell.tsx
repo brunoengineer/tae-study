@@ -6,12 +6,12 @@ import { go } from '../lib/router';
 const NAV = [
   { path: '/', icon: '🏠', label: 'Home' },
   { path: '/learn', icon: '📖', label: 'Learn' },
-  { path: '/map', icon: '🧠', label: 'Mind Map' },
+  { path: '/map', icon: '🧠', label: 'Mind Map', short: 'Map' },
   { path: '/practice', icon: '🎯', label: 'Practice' },
-  { path: '/exam', icon: '🎓', label: 'Mock Exam' },
-  { path: '/cards', icon: '🃏', label: 'Flashcards' },
+  { path: '/exam', icon: '🎓', label: 'Mock Exam', short: 'Exam' },
+  { path: '/cards', icon: '🃏', label: 'Flashcards', short: 'Cards' },
   { path: '/arcade', icon: '🕹️', label: 'Arcade' },
-  { path: '/trophies', icon: '🏆', label: 'Trophies' },
+  { path: '/trophies', icon: '🏆', label: 'Trophies', short: 'Awards' },
 ];
 
 export function Ring({ value, size = 56, stroke = 6, color = '#8b6cff', children }: { value: number; size?: number; stroke?: number; color?: string; children?: ReactNode }) {
@@ -122,7 +122,7 @@ export function Shell({ route, children }: { route: string[]; children: ReactNod
         </div>
         {NAV.map((n) => (
           <a key={n.path} href={`#${n.path}`} className={`nav-item ${cur === n.path ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); go(n.path); }}>
-            <span className="nav-ico">{n.icon}</span><span className="nav-label-text">{n.label}</span>
+            <span className="nav-ico">{n.icon}</span><span className="nav-label-text">{n.label}</span>{'short' in n && <span className="nav-label-short">{n.short}</span>}
           </a>
         ))}
         <div className="sidebar-foot">

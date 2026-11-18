@@ -13,7 +13,8 @@ export function LearnIndex() {
     <div>
       <h1 className="page-title">📖 Learn visually</h1>
       <p className="page-sub">Each chapter is a short series of interactive scenes. Poke the diagrams, read the story, lock it in with the memory hook, then answer the recall check to complete the scene (+5 XP).</p>
-      <div className="grid g2 mt2">
+      {/* auto-fit: two columns only when each card gets enough room (not on tablets beside the sidebar) */}
+      <div className="grid mt2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))' }}>
         {chapters.map((c) => {
           const st = chapterStats(s, c.id);
           return (
@@ -21,7 +22,7 @@ export function LearnIndex() {
               <div className="ch-num" style={{ color: c.color }}>{c.id}</div>
               <div className="row" style={{ alignItems: 'flex-start' }}>
                 <div className="ch-emoji">{c.emoji}</div>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="kicker" style={{ color: c.color }}>Chapter {c.id} · {c.minutes} min · up to K{c.maxK}</div>
                   <h3 style={{ marginTop: 4 }}>{c.title}</h3>
                   <div className="small muted" style={{ marginTop: 4 }}>{c.tagline}</div>
@@ -137,14 +138,15 @@ export function ChapterView({ ch, idx }: { ch: number; idx: number }) {
           <div className="row wrap">
             <h2 style={{ fontSize: 24 }}>{scene.icon} {scene.title}</h2>
             <span className="spacer" />
-            <span className="chip">{scene.lo}</span><span className="chip">§ {scene.ref}</span>
+            <span className="row" style={{ gap: 6 }}><span className="chip">{scene.lo}</span><span className="chip">§ {scene.ref}</span></span>
           </div>
           <div className="story mt">{scene.story}</div>
           <div className={`mt2 ${s.recallMode ? 'recall' : ''}`}>{scene.visual()}</div>
           {s.recallMode && <div className="tiny faint center mt">🙈 Recall mode: say each blurred detail out loud, then click it to check yourself.</div>}
         </div>
 
-        <div className="grid g2 mt">
+        {/* only split into two columns when there is both a hook and a trap */}
+        <div className={`grid mt ${scene.hook && scene.trap ? 'g2' : ''}`}>
           {scene.hook && <div className="hook"><span className="h-ico">🪝</span><div><b>Memory hook</b><div>{scene.hook}</div></div></div>}
           {scene.trap && <div className="trap"><span style={{ fontSize: 24 }}>🚨</span><div><b>Exam trap</b><div className="small">{scene.trap}</div></div></div>}
         </div>
@@ -156,7 +158,7 @@ export function ChapterView({ ch, idx }: { ch: number; idx: number }) {
         <div className="row mt2">
           <button className="btn" disabled={i === 0} onClick={() => go(`/learn/${ch}/${i - 1}`)}>← Previous</button>
           <span className="spacer" />
-          <span className="tiny faint">Tip: use ← → keys</span>
+          <span className="tiny faint hide-sm">Tip: use ← → keys</span>
           <span className="spacer" />
           {i < scenes.length - 1
             ? <button className="btn primary" onClick={() => go(`/learn/${ch}/${i + 1}`)}>Next scene →</button>

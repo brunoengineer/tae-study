@@ -88,32 +88,36 @@ export function Stack({ items, color }: { items: Item[]; color?: string }) {
 export function Hub({ center, items, color }: { center: Item; items: Item[]; color?: string }) {
   const [sel, setSel] = useState<number>(-1);
   const n = items.length;
-  const R = 39; // % radius
+  const R = 37; // horizontal % radius
+  // Satellites sit on a circle; vertically we stretch that circle to fill 13%..87% of the frame
+  // so odd counts (e.g. 3) don't leave a big empty band. Lines and nodes share these % coords.
+  // 16% margins leave room for half a (possibly 3-line) node above the top / below the bottom center.
+  const angles = items.map((_, i) => (i / n) * Math.PI * 2 - Math.PI / 2);
+  const sins = angles.map(Math.sin);
+  const lo = Math.min(-1, ...sins), hi = Math.max(...sins), TOP = 16, SPAN = 68;
+  const yOf = (s: number) => TOP + ((s - lo) / (hi - lo)) * SPAN;
+  const pts = angles.map((a) => ({ x: 50 + Math.cos(a) * R, y: yOf(Math.sin(a)) }));
+  const cy = yOf(0);
   return (
-    <div>
-      <div className="hub" style={{ position: 'relative', width: '100%', maxWidth: 620, aspectRatio: '1.35', margin: '0 auto' }}>
-        <svg viewBox="0 0 100 74" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} preserveAspectRatio="none">
-          {items.map((_, i) => {
-            const a = (i / n) * Math.PI * 2 - Math.PI / 2;
-            return (
-              <line key={i} x1={50} y1={37} x2={50 + Math.cos(a) * R} y2={37 + Math.sin(a) * R * 0.74}
-                stroke={sel === i ? (items[i].color ?? color ?? '#8b6cff') : 'rgba(150,150,200,0.35)'}
-                strokeWidth={sel === i ? 0.8 : 0.4} strokeDasharray={sel === i ? '0' : '1.5 1'} />
-            );
-          })}
+    <div className="hub-wrap">
+      <div className="hub" style={{ position: 'relative', width: '100%', maxWidth: 620, aspectRatio: '1.35', margin: '0 auto 8px' }}>
+        <svg viewBox="0 0 100 100" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} preserveAspectRatio="none" aria-hidden>
+          {pts.map((p, i) => (
+            <line key={i} x1={50} y1={cy} x2={p.x} y2={p.y} vectorEffect="non-scaling-stroke"
+              stroke={sel === i ? (items[i].color ?? color ?? '#8b6cff') : 'rgba(150,150,200,0.45)'}
+              strokeWidth={sel === i ? 2.5 : 1.5} strokeDasharray={sel === i ? '0' : '5 4'} />
+          ))}
         </svg>
-        <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', width: '28%' }}>
-          <div className={`node ${sel === -1 ? 'sel' : ''}`} style={cssVar(center.color ?? color)} onClick={() => setSel(-1)}>
+        <div style={{ position: 'absolute', left: '50%', top: `${cy}%`, transform: 'translate(-50%,-50%)', width: '28%' }}>
+          <div className={`node hub-node ${sel === -1 ? 'sel' : ''}`} style={cssVar(center.color ?? color)} onClick={() => setSel(-1)}>
             <div className="n-ico" style={{ fontSize: 40 }}>{center.icon}</div>
             <div className="n-title">{center.title}</div>
           </div>
         </div>
         {items.map((it, i) => {
-          const a = (i / n) * Math.PI * 2 - Math.PI / 2;
-          const left = 50 + Math.cos(a) * R;
-          const top = 50 + Math.sin(a) * R * 1.0;
+          const { x: left, y: top } = pts[i];
           return (
-            <div key={it.title} style={{ position: 'absolute', left: `${left}%`, top: `${top}%`, transform: 'translate(-50%,-50%)', width: '24%' }}>
+            <div key={it.title} className="hub-sat" style={{ position: 'absolute', left: `${left}%`, top: `${top}%`, transform: 'translate(-50%,-50%)', width: '24%' }}>
               <NodeBox item={it} sel={sel === i} onClick={() => setSel(i)} color={color} />
             </div>
           );
@@ -129,7 +133,7 @@ export function FlipGrid({ items, color, min = 160 }: { items: Item[]; color?: s
   const [flipped, setFlipped] = useState<Record<number, boolean>>({});
   return (
     <div>
-      <div className="icon-grid" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(${min}px, 1fr))` }}>
+      <div className="icon-grid" style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${min}px, 1fr))` }}>
         {items.map((it, i) => (
           <div key={it.title} className={`flip ${flipped[i] ? 'flipped' : ''}`} style={{ ...cssVar(it.color ?? color), minHeight: 150 }}
             onClick={() => setFlipped((f) => ({ ...f, [i]: !f[i] }))}>

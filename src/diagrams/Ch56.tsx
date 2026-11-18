@@ -15,7 +15,7 @@ export function PipelineViz() {
   );
   return (
     <div>
-      <div className="row wrap" style={{ alignItems: 'stretch', gap: 10 }}>
+      <div className="row wrap pipe-row" style={{ alignItems: 'stretch', gap: 10 }}>
         <Stage icon="🏗️" title="BUILD phase (CI)" color="#8b6cff" gate tests={['TAF/TAS configuration tests (paths & files exist)', 'Component tests', 'Component integration tests']} />
         <div className="flow-arrow">➜</div>
         <Stage icon="🚚" title="DEPLOY phase" color="#22d3ee" gate={ap === 'in'} tests={ap === 'in' ? ['System integration / system / acceptance tests run INSIDE deployment'] : ['Deploy only', 'Few simple deployment checks (smoke)']} />
@@ -55,25 +55,25 @@ export function ContractHandshake() {
   return (
     <div>
       <Tabs value={mode} onChange={setMode} tabs={[{ id: 'cdc', label: '📱 Consumer-driven' }, { id: 'pdc', label: '🖥️ Provider-driven' }]} />
-      <svg viewBox="0 0 560 190" style={{ width: '100%', marginTop: 10 }}>
+      <svg viewBox="0 32 560 158" style={{ width: '100%', marginTop: 10 }}>
         <defs>
           <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#ffb703" /></marker>
         </defs>
-        <rect x="10" y="50" width="140" height="90" rx="16" fill="rgba(139,108,255,0.18)" stroke="#8b6cff" strokeWidth={cdc ? 3 : 1} />
-        <text x="80" y="88" textAnchor="middle" fontSize="28">📱</text>
-        <text x="80" y="120" textAnchor="middle" fontSize="14" fontWeight="700" fill="var(--text)">Consumer</text>
-        <rect x="410" y="50" width="140" height="90" rx="16" fill="rgba(34,211,238,0.18)" stroke="#22d3ee" strokeWidth={!cdc ? 3 : 1} />
-        <text x="480" y="88" textAnchor="middle" fontSize="28">🖥️</text>
-        <text x="480" y="120" textAnchor="middle" fontSize="14" fontWeight="700" fill="var(--text)">Provider</text>
-        <rect x="220" y="40" width="120" height="110" rx="10" fill="rgba(255,183,3,0.15)" stroke="#ffb703" strokeDasharray="5 4" />
+        <rect x="4" y="50" width="126" height="90" rx="16" fill="rgba(139,108,255,0.18)" stroke="#8b6cff" strokeWidth={cdc ? 3 : 1} />
+        <text x="67" y="88" textAnchor="middle" fontSize="28">📱</text>
+        <text x="67" y="120" textAnchor="middle" fontSize="14" fontWeight="700" fill="var(--text)">Consumer</text>
+        <rect x="430" y="50" width="126" height="90" rx="16" fill="rgba(34,211,238,0.18)" stroke="#22d3ee" strokeWidth={!cdc ? 3 : 1} />
+        <text x="493" y="88" textAnchor="middle" fontSize="28">🖥️</text>
+        <text x="493" y="120" textAnchor="middle" fontSize="14" fontWeight="700" fill="var(--text)">Provider</text>
+        <rect x="226" y="40" width="108" height="110" rx="10" fill="rgba(255,183,3,0.15)" stroke="#ffb703" strokeDasharray="5 4" />
         <text x="280" y="80" textAnchor="middle" fontSize="30">📜</text>
         <text x="280" y="108" textAnchor="middle" fontSize="13" fontWeight="700" fill="#ffb703">CONTRACT</text>
         <text x="280" y="126" textAnchor="middle" fontSize="10" fill="var(--muted)">allowed interactions</text>
         {cdc
-          ? <><line x1="150" y1="95" x2="216" y2="95" stroke="#ffb703" strokeWidth="3" markerEnd="url(#ah)" /><line x1="340" y1="95" x2="406" y2="95" stroke="#ffb703" strokeWidth="3" strokeDasharray="6 4" markerEnd="url(#ah)" />
-            <text x="183" y="84" textAnchor="middle" fontSize="10" fill="var(--text)">writes</text><text x="373" y="84" textAnchor="middle" fontSize="10" fill="var(--text)">verified vs</text></>
-          : <><line x1="410" y1="95" x2="344" y2="95" stroke="#ffb703" strokeWidth="3" markerEnd="url(#ah)" /><line x1="220" y1="95" x2="154" y2="95" stroke="#ffb703" strokeWidth="3" strokeDasharray="6 4" markerEnd="url(#ah)" />
-            <text x="377" y="84" textAnchor="middle" fontSize="10" fill="var(--text)">writes</text><text x="187" y="84" textAnchor="middle" fontSize="10" fill="var(--text)">consumed by</text></>}
+          ? <><line x1="130" y1="95" x2="222" y2="95" stroke="#ffb703" strokeWidth="3" markerEnd="url(#ah)" /><line x1="334" y1="95" x2="426" y2="95" stroke="#ffb703" strokeWidth="3" strokeDasharray="6 4" markerEnd="url(#ah)" />
+            <text x="178" y="84" textAnchor="middle" fontSize="10" fill="var(--text)">writes</text><text x="382" y="84" textAnchor="middle" fontSize="10" fill="var(--text)">verified vs</text></>
+          : <><line x1="430" y1="95" x2="338" y2="95" stroke="#ffb703" strokeWidth="3" markerEnd="url(#ah)" /><line x1="226" y1="95" x2="134" y2="95" stroke="#ffb703" strokeWidth="3" strokeDasharray="6 4" markerEnd="url(#ah)" />
+            <text x="382" y="84" textAnchor="middle" fontSize="10" fill="var(--text)">writes</text><text x="178" y="84" textAnchor="middle" fontSize="10" fill="var(--text)">consumed by</text></>}
         <text x="280" y="178" textAnchor="middle" fontSize="12" fill="var(--muted)">{cdc ? 'Consumer sets its EXPECTATIONS of how the provider shall respond' : 'Provider creates the contract showing HOW its services operate'}</text>
       </svg>
       <div className="grid g2 mt">
@@ -100,12 +100,12 @@ export function TraceId() {
   useEffect(() => { const t = setInterval(() => setI((x) => (x + 1) % (hops.length + 2)), 900); return () => clearInterval(t); }, [hops.length]);
   return (
     <div>
-      <div className="row" style={{ justifyContent: 'space-between', gap: 6, overflowX: 'auto', padding: '8px 0' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(92px, 1fr))', gap: 10, padding: '8px 0' }}>
         {hops.map(([ic, n], k) => (
-          <div key={n} className="col" style={{ alignItems: 'center', gap: 6, minWidth: 92 }}>
+          <div key={n} className="col" style={{ alignItems: 'center', gap: 6, textAlign: 'center' }}>
             <div style={{ fontSize: 30, width: 60, height: 60, borderRadius: 18, display: 'grid', placeItems: 'center', background: k <= i - 1 ? 'rgba(255,183,3,0.25)' : 'var(--panel-2)', border: `2px solid ${k === i - 1 ? '#ffb703' : 'var(--border)'}`, transition: 'all .3s' }}>{ic}</div>
             <b className="small">{n}</b>
-            <code className="tiny" style={{ opacity: k <= i - 1 ? 1 : 0.15, color: '#ffb703', transition: 'opacity .3s' }}>trace-7f3a · {12 + k * 17}ms</code>
+            <code className="tiny" style={{ opacity: k <= i - 1 ? 1 : 0.35, color: '#ffb703', transition: 'opacity .3s' }}>trace-7f3a · {12 + k * 17}ms</code>
           </div>
         ))}
       </div>

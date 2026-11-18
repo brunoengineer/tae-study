@@ -24,10 +24,13 @@ export function StaticScan() {
   };
   return (
     <div className="grid g2" style={{ alignItems: 'start' }}>
-      <div style={{ background: '#05060d', borderRadius: 14, padding: 14, fontFamily: 'var(--mono)', fontSize: 12.5, border: '1px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
-        {CODE.map((c, i) => (
-          <div key={i} style={{ whiteSpace: 'pre', color: '#cbd5e1', background: line === i ? 'rgba(139,108,255,0.35)' : done && c.s ? `${c.s.c}22` : undefined, borderLeft: done && c.s ? `3px solid ${c.s.c}` : '3px solid transparent', paddingLeft: 6 }}>{c.l}</div>
-        ))}
+      <div style={{ background: '#05060d', borderRadius: 14, padding: 14, fontFamily: 'var(--mono)', fontSize: 12.5, border: '1px solid var(--border)', position: 'relative', overflowX: 'auto', minWidth: 0 }}>
+        {/* min-width: max-content keeps the line highlights full-width while the block scrolls on narrow screens */}
+        <div style={{ minWidth: 'max-content' }}>
+          {CODE.map((c, i) => (
+            <div key={i} style={{ whiteSpace: 'pre', color: '#cbd5e1', background: line === i ? 'rgba(139,108,255,0.35)' : done && c.s ? `${c.s.c}22` : undefined, borderLeft: done && c.s ? `3px solid ${c.s.c}` : '3px solid transparent', paddingLeft: 6 }}>{c.l}</div>
+          ))}
+        </div>
       </div>
       <div className="col">
         <button className="btn primary" onClick={run}>🔍 Run static analysis</button>
@@ -141,7 +144,7 @@ export function SchemaValidation() {
         <Tabs value="x" onChange={() => {}} tabs={[{ id: 'x', label: '6 mandatory string fields' }]} />
         <div className="grid g2">
           <div className="vs-col"><b>😩 Without</b><div className="tiny muted mt" style={{ fontFamily: 'var(--mono)' }}>{fields.map((f) => <div key={f}>assert typeof {f} == string<br />assert {f} != null</div>)}</div><div className="small mt">12 assertions</div></div>
-          <div className="vs-col"><b>😎 With schema</b><div className="tiny muted mt" style={{ fontFamily: 'var(--mono)' }}>validate(res, customerSchema)</div><div className="small mt">1 line — shorter code, more efficient defect detection</div></div>
+          <div className="vs-col"><b>😎 With schema</b><div className="tiny muted mt" style={{ fontFamily: 'var(--mono)', overflowWrap: 'anywhere' }}>validate(res, customerSchema)</div><div className="small mt">1 line — shorter code, more efficient defect detection</div></div>
         </div>
         <div className={`feedback ${broken ? 'no' : 'ok'}`}>
           {broken ? <>❌ Schema broken: <code>{broken}</code> expected <b>string</b>, got <b>{broken === 'email' ? 'null' : 'number'}</b> — the validator returns the actual failure → root cause fast.</> : '✅ Response matches the business specification (mandatory elements present, types match).'}

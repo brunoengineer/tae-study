@@ -35,7 +35,7 @@ export function ScaleBalance() {
   const color = side === 'adv' ? 'var(--good)' : side === 'dis' ? 'var(--bad)' : 'var(--warn)';
   return (
     <div className="grid g2" style={{ alignItems: 'center' }}>
-      <svg viewBox="0 0 320 240" style={{ width: '100%', maxWidth: 420 }}>
+      <svg viewBox="0 0 320 246" style={{ width: '100%', maxWidth: 420, justifySelf: 'center' }}>
         <defs>
           <linearGradient id="beam" x1="0" x2="1"><stop offset="0" stopColor="#34d399" /><stop offset="1" stopColor="#fb7185" /></linearGradient>
         </defs>
@@ -53,15 +53,16 @@ export function ScaleBalance() {
             <line x1="45" y1="124" x2="25" y2="170" stroke="var(--faint)" /><line x1="45" y1="124" x2="85" y2="170" stroke="var(--faint)" />
             <path d="M15 170 h80 a40 18 0 0 1 -80 0z" fill="rgba(52,211,153,0.25)" stroke="#34d399" />
             <text x="55" y="168" textAnchor="middle" fontSize="20">✅</text>
-            <text x="55" y="200" textAnchor="middle" fontSize="11" fill="#34d399" fontWeight="700">9 ADVANTAGES</text>
           </g>
           <g style={{ cursor: 'pointer' }} onClick={() => setSide('dis')}>
             <line x1="275" y1="124" x2="235" y2="170" stroke="var(--faint)" /><line x1="275" y1="124" x2="295" y2="170" stroke="var(--faint)" />
             <path d="M225 170 h80 a40 18 0 0 1 -80 0z" fill="rgba(251,113,133,0.25)" stroke="#fb7185" />
             <text x="265" y="168" textAnchor="middle" fontSize="20">⚠️</text>
-            <text x="265" y="200" textAnchor="middle" fontSize="11" fill="#fb7185" fontWeight="700">6 DISADVANTAGES</text>
           </g>
         </g>
+        {/* labels stay level (outside the tilting beam) so they never rotate out of the frame */}
+        <text x="55" y="238" textAnchor="middle" fontSize="11" fill="#34d399" fontWeight="700" style={{ cursor: 'pointer' }} onClick={() => setSide('adv')}>9 ADVANTAGES</text>
+        <text x="265" y="238" textAnchor="middle" fontSize="11" fill="#fb7185" fontWeight="700" style={{ cursor: 'pointer' }} onClick={() => setSide('dis')}>6 DISADVANTAGES</text>
       </svg>
       <div>
         <Tabs value={side} onChange={setSide} tabs={[{ id: 'adv', label: '✅ Advantages' }, { id: 'dis', label: '⚠️ Disadvantages' }, { id: 'lim', label: '🧱 Limitations' }]} />
@@ -83,44 +84,74 @@ export function SdlcModels() {
   return (
     <div>
       <Tabs value={m} onChange={setM} tabs={[{ id: 'wf', label: '🪜 Waterfall' }, { id: 'v', label: '✌️ V-model' }, { id: 'ag', label: '🔄 Agile' }]} />
-      <div className="grid g2 mt" style={{ alignItems: 'center' }}>
+      <div className="grid g2 sdlc-grid mt" style={{ alignItems: 'center' }}>
         {m === 'wf' && (
-          <svg viewBox="0 0 340 220" style={{ width: '100%' }}>
-            {['Requirements', 'Design', 'Implementation', 'Verification', 'Maintenance'].map((p, i) => (
-              <g key={p}>
-                <rect x={10 + i * 62} y={14 + i * 38} width="110" height="30" rx="8"
-                  fill={i === 2 ? 'rgba(139,108,255,0.35)' : i === 3 ? 'rgba(52,211,153,0.3)' : 'var(--panel-2)'}
-                  stroke={i === 2 ? '#8b6cff' : i === 3 ? '#34d399' : 'var(--border-strong)'} />
-                <text x={65 + i * 62} y={34 + i * 38} textAnchor="middle" fontSize="11" fill="var(--text)" fontWeight="600">{p}</text>
-                {i < 4 && <path d={`M${120 + i * 62} ${29 + i * 38} q 14 0 14 22`} fill="none" stroke="var(--faint)" markerEnd="" />}
-              </g>
-            ))}
-            <text x="140" y="118" fontSize="10" fill="#8b6cff">🛠️ build automation (∥ or after)</text>
-            <text x="200" y="156" fontSize="10" fill="#34d399">▶ run tests here</text>
+          <svg viewBox="0 0 400 248" style={{ width: '100%' }} role="img" aria-label="Waterfall model: five sequential phases">
+            <defs>
+              <marker id="wf-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10z" fill="var(--faint)" />
+              </marker>
+            </defs>
+            {['Requirements', 'Design', 'Implementation', 'Verification', 'Maintenance'].map((p, i) => {
+              const x = 8 + i * 56, y = 8 + i * 44;
+              return (
+                <g key={p}>
+                  {i < 4 && <path d={`M${x + 118} ${y + 16} h 14 v 26`} fill="none" stroke="var(--faint)" strokeWidth="1.5" markerEnd="url(#wf-arrow)" />}
+                  <rect x={x} y={y} width="118" height="32" rx="8"
+                    fill={i === 2 ? 'rgba(139,108,255,0.3)' : i === 3 ? 'rgba(52,211,153,0.25)' : 'var(--panel-2)'}
+                    stroke={i === 2 ? '#8b6cff' : i === 3 ? '#34d399' : 'var(--border-strong)'} strokeWidth="1.5" />
+                  <text x={x + 59} y={y + 20} textAnchor="middle" fontSize="11" fill="var(--text)" fontWeight="700">{p}</text>
+                </g>
+              );
+            })}
+            {/* annotations sit to the right of their phase, clear of the connectors */}
+            <text x="260" y="112" fontSize="10" fill="#a78bfa" fontWeight="700">🛠️ build automation</text>
+            <text x="260" y="125" fontSize="10" fill="#a78bfa">in parallel or after</text>
+            <text x="316" y="156" fontSize="10" fill="#34d399" fontWeight="700">▶ tests run</text>
+            <text x="316" y="169" fontSize="10" fill="#34d399">here (late)</text>
+            <text x="8" y="242" fontSize="9.5" fill="var(--muted)">📄 each phase ends with approved documentation</text>
           </svg>
         )}
         {m === 'v' && (
-          <svg viewBox="0 0 340 220" style={{ width: '100%' }}>
-            <path d="M20 20 L170 200 L320 20" fill="none" stroke="var(--border-strong)" strokeWidth="26" strokeLinejoin="round" opacity="0.5" />
-            {[['Requirements', 'Acceptance'], ['System spec', 'System (integration)'], ['Architecture', 'Component integration'], ['Detailed design', 'Component']].map(([l, r], i) => (
-              <g key={l}>
-                <text x={40 + i * 36} y={30 + i * 44} fontSize="10" fill="var(--text)" fontWeight="600">{l}</text>
-                <text x={300 - i * 36} y={30 + i * 44} fontSize="10" fill="#34d399" fontWeight="700" textAnchor="end">{r}</text>
-                <line x1={110 + i * 36} y1={27 + i * 44} x2={230 - i * 36} y2={27 + i * 44} stroke="#8b6cff" strokeDasharray="3 3" opacity="0.7" />
-                <text x="170" y={24 + i * 44} fontSize="9" fill="#8b6cff" textAnchor="middle">TAF</text>
-              </g>
-            ))}
-            <text x="170" y="212" textAnchor="middle" fontSize="10" fill="var(--muted)">Code</text>
+          <svg viewBox="0 0 420 246" style={{ width: '100%' }} role="img" aria-label="V-model: each specification level pairs with a test level and its own TAF">
+            {/* the V itself, drawn behind the boxes */}
+            <path d="M74 25 L122 163 L210 216 L298 163 L346 25" fill="none" stroke="var(--border-strong)" strokeWidth="18" strokeLinejoin="round" strokeLinecap="round" opacity="0.35" />
+            {[['Requirements', 'Acceptance'], ['System spec', 'System (integration)'], ['Architecture', 'Component integration'], ['Detailed design', 'Component']].map(([l, r], i) => {
+              const y = 10 + i * 46, lx = 8 + i * 16, rx = 280 - i * 16, w = 132;
+              return (
+                <g key={l}>
+                  <line x1={lx + w} y1={y + 15} x2={rx} y2={y + 15} stroke="#8b6cff" strokeDasharray="3 3" strokeWidth="1.2" />
+                  <rect x={lx} y={y} width={w} height="30" rx="8" fill="var(--panel-solid)" stroke="var(--border-strong)" strokeWidth="1.5" />
+                  <text x={lx + w / 2} y={y + 19} textAnchor="middle" fontSize="10.5" fill="var(--text)" fontWeight="700">{l}</text>
+                  <rect x={rx} y={y} width={w} height="30" rx="8" fill="var(--panel-solid)" stroke="#34d399" strokeWidth="1.5" />
+                  <text x={rx + w / 2} y={y + 19} textAnchor="middle" fontSize="10" fill="#34d399" fontWeight="700">{r}</text>
+                  <rect x="194" y={y + 7} width="32" height="16" rx="8" fill="var(--panel-solid)" stroke="#8b6cff" />
+                  <text x="210" y={y + 18.5} textAnchor="middle" fontSize="8.5" fill="#a78bfa" fontWeight="800">TAF</text>
+                </g>
+              );
+            })}
+            <rect x="170" y="200" width="80" height="30" rx="8" fill="var(--panel-solid)" stroke="var(--border-strong)" strokeWidth="1.5" />
+            <text x="210" y="219" textAnchor="middle" fontSize="10.5" fill="var(--muted)" fontWeight="700">Code</text>
+            <text x="8" y="242" fontSize="9" fill="var(--muted)">⬇ specify</text>
+            <text x="412" y="242" fontSize="9" fill="var(--muted)" textAnchor="end">test ⬆</text>
           </svg>
         )}
         {m === 'ag' && (
-          <svg viewBox="0 0 340 220" style={{ width: '100%' }}>
-            <circle cx="170" cy="110" r="80" fill="none" stroke="#22d3ee" strokeWidth="6" strokeDasharray="14 8" style={{ animation: 'spin 12s linear infinite', transformOrigin: '170px 110px' }} />
-            <style>{'@keyframes spin{to{transform:rotate(360deg)}}'}</style>
-            <text x="170" y="104" textAnchor="middle" fontSize="15" fontWeight="800" fill="var(--text)">Sprint</text>
-            <text x="170" y="124" textAnchor="middle" fontSize="11" fill="#22d3ee">in-sprint automation</text>
-            {[['👥', 'No silos', 20, 40], ['🔍', 'Code reviews', 260, 40], ['🧑‍🤝‍🧑', 'Pair programming', 10, 195], ['🔁', 'Frequent runs', 250, 195]].map(([i, t, x, y]) => (
-              <g key={t as string}><text x={x as number} y={y as number} fontSize="18">{i}</text><text x={(x as number) + 24} y={(y as number) - 4} fontSize="10" fill="var(--text)">{t}</text></g>
+          <svg viewBox="0 0 400 250" style={{ width: '100%' }} role="img" aria-label="Agile: in-sprint automation surrounded by four practices">
+            <style>{'@keyframes sdlc-spin{to{transform:rotate(360deg)}}'}</style>
+            {[[138, 42, 152, 72], [262, 42, 248, 72], [138, 208, 152, 178], [262, 208, 248, 178]].map(([x1, y1, x2, y2], k) => (
+              <line key={k} x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--border-strong)" strokeDasharray="3 3" />
+            ))}
+            <circle cx="200" cy="125" r="72" fill="rgba(34,211,238,0.06)" stroke="#22d3ee" strokeWidth="6" strokeDasharray="14 8"
+              style={{ animation: 'sdlc-spin 12s linear infinite', transformOrigin: '200px 125px' }} />
+            <text x="200" y="121" textAnchor="middle" fontSize="16" fontWeight="800" fill="var(--text)">Sprint</text>
+            <text x="200" y="140" textAnchor="middle" fontSize="10.5" fill="#22d3ee" fontWeight="600">in-sprint automation</text>
+            {([['👥', 'No silos', 4, 12], ['🔍', 'Code reviews', 262, 12], ['🧑‍🤝‍🧑', 'Pair programming', 4, 208], ['🔁', 'Frequent runs', 262, 208]] as const).map(([i, t, x, y]) => (
+              <g key={t}>
+                <rect x={x} y={y} width="134" height="30" rx="15" fill="var(--panel-2)" stroke="var(--border-strong)" strokeWidth="1.5" />
+                <text x={x + 12} y={y + 20} fontSize="13">{i}</text>
+                <text x={x + 32} y={y + 19} fontSize="10.5" fill="var(--text)" fontWeight="600">{t}</text>
+              </g>
             ))}
           </svg>
         )}

@@ -4,7 +4,7 @@ import { scenesFor, sceneKey } from '../data/lessons';
 import { useStore } from '../lib/store';
 import { go } from '../lib/router';
 
-const W = 1100, H = 800, CX = W / 2, CY = H / 2;
+const W = 1100, H = 840, CX = W / 2, CY = H / 2;
 
 function wrap(text: string, max = 18): string[] {
   const words = text.split(' ');
@@ -35,14 +35,20 @@ export function MindMap() {
         </div>
         <p className="page-sub">Each branch is a lesson scene. Before clicking, try to explain the branch out loud — that's retrieval practice on a map.</p>
         <div className="mindmap-wrap mt">
-          <svg viewBox={`0 0 ${W} ${H}`} className="mindmap" style={{ width: '100%', display: 'block' }}>
+          <svg viewBox={`0 0 ${W} ${H}`} className="mindmap" style={{ width: '100%', display: 'block', minWidth: 'var(--map-min, 0px)' }}>
+            {/* connectors first so they never cross over another scene's box */}
+            {scenes.map((_, i) => {
+              const a = (i / n) * Math.PI * 2 - Math.PI / 2;
+              const x = CX + Math.cos(a) * R * 1.35, y = CY + Math.sin(a) * R;
+              const done = !!s.scenes[sceneKey(focus, i)];
+              return <path key={i} d={`M${CX} ${CY} Q ${(CX + x) / 2 + Math.sin(a) * 40} ${(CY + y) / 2 - Math.cos(a) * 40} ${x} ${y}`} fill="none" stroke={c.color} strokeWidth={done ? 5 : 3} opacity={done ? 0.9 : 0.45} style={{ animation: `sceneIn .4s ${i * 0.06}s both` }} />;
+            })}
             {scenes.map((sc, i) => {
               const a = (i / n) * Math.PI * 2 - Math.PI / 2;
               const x = CX + Math.cos(a) * R * 1.35, y = CY + Math.sin(a) * R;
               const done = !!s.scenes[sceneKey(focus, i)];
               return (
                 <g key={i} className="mm-node" onClick={() => go(`/learn/${focus}/${i}`)} style={{ animation: `sceneIn .4s ${i * 0.06}s both` }}>
-                  <path d={`M${CX} ${CY} Q ${(CX + x) / 2 + Math.sin(a) * 40} ${(CY + y) / 2 - Math.cos(a) * 40} ${x} ${y}`} fill="none" stroke={c.color} strokeWidth={done ? 5 : 3} opacity={done ? 0.9 : 0.45} />
                   <rect x={x - 110} y={y - 50} width="220" height="100" rx="22" fill="var(--panel-solid)" stroke={c.color} strokeWidth={done ? 3 : 1.5} />
                   <text x={x} y={y - 14} textAnchor="middle" fontSize="28">{sc.icon}</text>
                   {wrap(sc.title, 24).map((l, k) => <text key={k} x={x} y={y + 14 + k * 17} textAnchor="middle" fontSize="15" fontWeight="600" fill="var(--text)">{l}</text>)}
@@ -70,7 +76,14 @@ export function MindMap() {
       <h1 className="page-title">🧠 Syllabus Mind Map</h1>
       <p className="page-sub">The whole CTAL-TAE syllabus on one screen. <b>Bubble size = exam weight</b> (points in the official sample). Click a chapter to zoom into its concepts.</p>
       <div className="mindmap-wrap mt">
-        <svg viewBox={`0 0 ${W} ${H}`} className="mindmap" style={{ width: '100%', display: 'block' }}>
+        <svg viewBox={`0 0 ${W} ${H}`} className="mindmap" style={{ width: '100%', display: 'block', minWidth: 'var(--map-min, 0px)' }}>
+          {/* all connectors first, so no line is painted over another chapter's bubble or label */}
+          {chapters.map((c, i) => {
+            const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+            const x = CX + Math.cos(a) * 400, y = CY + Math.sin(a) * 280;
+            const dim = hover !== null && hover !== c.id;
+            return <path key={c.id} className={`mm-node ${dim ? 'mm-dim' : ''}`} d={`M${CX} ${CY} Q ${(CX + x) / 2} ${(CY + y) / 2 + 30} ${x} ${y}`} fill="none" stroke={c.color} strokeWidth="4" opacity="0.6" />;
+          })}
           {chapters.map((c, i) => {
             const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
             const x = CX + Math.cos(a) * 400, y = CY + Math.sin(a) * 280;
@@ -78,13 +91,12 @@ export function MindMap() {
             const dim = hover !== null && hover !== c.id;
             return (
               <g key={c.id} className={`mm-node ${dim ? 'mm-dim' : ''}`} onClick={() => setFocus(c.id)} onMouseEnter={() => setHover(c.id)} onMouseLeave={() => setHover(null)}>
-                <path d={`M${CX} ${CY} Q ${(CX + x) / 2} ${(CY + y) / 2 + 30} ${x} ${y}`} fill="none" stroke={c.color} strokeWidth="4" opacity="0.6" />
                 <circle cx={x} cy={y} r={r + 8} fill={c.color} opacity="0.18" />
                 <circle cx={x} cy={y} r={r} fill="var(--panel-solid)" stroke={c.color} strokeWidth="3" />
                 <text x={x} y={y - 4} textAnchor="middle" fontSize={r * 0.55}>{c.emoji}</text>
                 <text x={x} y={y + r * 0.42} textAnchor="middle" fontSize="13" fontWeight="700" fill="var(--text)">{c.examPoints} pts</text>
-                <text x={x} y={y + r + 26} textAnchor="middle" fontSize="16" fontWeight="700" fill="var(--text)">{c.id}. {c.short}</text>
-                <text x={x} y={y + r + 44} textAnchor="middle" fontSize="12" fill="var(--muted)">{scenesFor(c.id).length} concepts · K{c.maxK}</text>
+                <text x={x} y={y + r + 26} textAnchor="middle" fontSize="16" fontWeight="700" fill="var(--text)" className="mm-halo">{c.id}. {c.short}</text>
+                <text x={x} y={y + r + 44} textAnchor="middle" fontSize="12" fill="var(--muted)" className="mm-halo">{scenesFor(c.id).length} concepts · K{c.maxK}</text>
               </g>
             );
           })}

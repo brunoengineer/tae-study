@@ -82,7 +82,7 @@ export function Home() {
 
       <div className="card">
         <div className="row"><div className="section-title" style={{ marginBottom: 0 }}>🗺️ Your journey</div><span className="spacer" /><span className="tiny muted">Ring = mastery (lessons + last answers). Click a station.</span></div>
-        <MetroMap />
+        <div className="map-scroll"><MetroMap /></div>
       </div>
 
       <div className="grid g4">

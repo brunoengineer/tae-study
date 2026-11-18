@@ -147,11 +147,13 @@ export function ApproachLadder() {
             <button className={`chip click ${sel === x.id ? 'on' : ''}`} style={sel === x.id ? { background: x.c } : undefined} onClick={() => setSel(x.id)}>{x.icon} {x.name}</button>
           </div>
         ))}
-        <span className="faint" style={{ margin: '0 6px' }}>|</span>
-        <span className="tiny muted">dev methodologies →</span>
-        {APPROACHES.slice(5).map((x) => (
-          <button key={x.id} className={`chip click ${sel === x.id ? 'on' : ''}`} style={sel === x.id ? { background: x.c } : undefined} onClick={() => setSel(x.id)}>{x.icon} {x.name}</button>
-        ))}
+        {/* kept as one unit so the label never gets separated from its chips when the row wraps */}
+        <div className="row wrap" style={{ gap: 6, marginLeft: 8, paddingLeft: 10, borderLeft: '1px solid var(--border-strong)' }}>
+          <span className="tiny muted">dev methodologies →</span>
+          {APPROACHES.slice(5).map((x) => (
+            <button key={x.id} className={`chip click ${sel === x.id ? 'on' : ''}`} style={sel === x.id ? { background: x.c } : undefined} onClick={() => setSel(x.id)}>{x.icon} {x.name}</button>
+          ))}
+        </div>
       </div>
       <div className="detail" style={{ ['--c' as string]: a.c }}>
         <h4 style={{ fontSize: 18 }}>{a.icon} {a.name}</h4>

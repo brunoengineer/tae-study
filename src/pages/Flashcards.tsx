@@ -108,7 +108,7 @@ export function Flashcards() {
 
       <div className="card mt2">
         <div className="section-title">📦 Leitner boxes</div>
-        <div className="leitner" style={{ gridTemplateColumns: 'repeat(6, 1fr)' }}>
+        <div className="leitner">
           {['🔁 Relearn', '1 day', '2 days', '4 days', '8 days', '🏆 16 days'].map((label, b) => (
             <div key={label} className="box" style={{ borderColor: b === 5 ? 'var(--good)' : b === 0 ? 'var(--bad)' : undefined }}>
               <b>{boxes[b]}</b><span className="tiny muted">{label}</span>

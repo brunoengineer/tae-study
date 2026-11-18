@@ -23,7 +23,7 @@ export function Trophies() {
 
       <div className="card mt2">
         <div className="section-title">🧗 Level path — from manual clicker to automation legend</div>
-        <div className="row" style={{ overflowX: 'auto', gap: 0, paddingBottom: 8 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(92px, 1fr))', rowGap: 14, paddingBottom: 8 }}>
           {LEVELS.map((l, i) => {
             const reached = s.xp >= l.xp;
             const current = i + 1 === lv.level;
